@@ -1,4 +1,4 @@
-package org.google.calendar.synch.service;
+package org.ipuppyp.google.calendar.synch.service;
 
 import java.io.File;
 import java.io.FileInputStream;

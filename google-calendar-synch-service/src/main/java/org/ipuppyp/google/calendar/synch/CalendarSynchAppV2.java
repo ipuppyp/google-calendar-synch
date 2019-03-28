@@ -1,14 +1,15 @@
-package org.google.calendar.synch;
+package org.ipuppyp.google.calendar.synch;
 
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.google.calendar.synch.service.CalendarCrudService;
+import org.ipuppyp.google.calendar.synch.service.CalendarCrudService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +41,6 @@ public class CalendarSynchAppV2 {
 	}
 
 	public CalendarSynchAppV2() {
-		calendarCrudService = new CalendarCrudService(APPLICATION_NAME, CREDENTIALS, DATA_STORE_DIR);
 		sourceCalendar = getProperty("sourceCalendar");
 		targetCalendar = getProperty("targetCalendar");
 		eventPrefix = getProperty("eventPrefix");
@@ -50,7 +50,7 @@ public class CalendarSynchAppV2 {
 	private String getProperty(String key) {
 		String property = System.getProperty(key);
 		if (property == null) {
-			System.err.printf("Missing configuration: %s, please set it with -D\n", key);
+			LOGGER.error("Missing configuration: %s, please set it with -D\n", key);
 			System.exit(-1);
 		}
 		return property;
@@ -70,7 +70,13 @@ public class CalendarSynchAppV2 {
 		LOGGER.info("* eventFilter = {}\t*", eventFilter);
 		LOGGER.info("*********************************");
 
-		synch();
+		try {
+			calendarCrudService = new CalendarCrudService(APPLICATION_NAME, CREDENTIALS, DATA_STORE_DIR);
+			synch();
+		}
+		catch (Exception ex) {
+			LOGGER.error("Exception during syncronization", ex);
+		}
 
 		LOGGER.info("*********************************");
 		LOGGER.info("* SYNCHRONIZATION FINISHED.     *");
@@ -146,10 +152,12 @@ public class CalendarSynchAppV2 {
 	}
 	
 	private Event setIds(Event event) {
+		Map<String, String> shared = new HashMap<>();
+		shared.put(ORIG_I_CAL_UID, event.getICalUID());
 		return event
 				.setSummary(eventPrefix + " " + event.getSummary())
 				.setId(null)
-				.setExtendedProperties(new ExtendedProperties().setShared(Map.of(ORIG_I_CAL_UID, event.getICalUID())))
+				.setExtendedProperties(new ExtendedProperties().setShared(shared))
 				.setICalUID(null);
 		
 	}
