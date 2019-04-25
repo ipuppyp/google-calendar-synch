@@ -3,6 +3,7 @@ package org.google.calendar.synch;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -50,7 +51,7 @@ public class CalendarSynchAppV2 {
 	private String getProperty(String key) {
 		String property = System.getProperty(key);
 		if (property == null) {
-			System.err.printf("Missing configuration: %s, please set it with -D\n", key);
+			LOGGER.error("Missing configuration: %s, please set it with -D\n", key);
 			System.exit(-1);
 		}
 		return property;
@@ -70,7 +71,12 @@ public class CalendarSynchAppV2 {
 		LOGGER.info("* eventFilter = {}\t*", eventFilter);
 		LOGGER.info("*********************************");
 
-		synch();
+		try {			
+			synch();
+		}
+		catch (Exception ex) {
+			LOGGER.error("Exception during synchronization", ex);
+		}
 
 		LOGGER.info("*********************************");
 		LOGGER.info("* SYNCHRONIZATION FINISHED.     *");
@@ -146,10 +152,12 @@ public class CalendarSynchAppV2 {
 	}
 	
 	private Event setIds(Event event) {
+		Map<String, String> shared = new HashMap<>();
+		shared.put(ORIG_I_CAL_UID, event.getICalUID());
 		return event
 				.setSummary(eventPrefix + " " + event.getSummary())
 				.setId(null)
-				.setExtendedProperties(new ExtendedProperties().setShared(Map.of(ORIG_I_CAL_UID, event.getICalUID())))
+				.setExtendedProperties(new ExtendedProperties().setShared(shared))
 				.setICalUID(null);
 		
 	}

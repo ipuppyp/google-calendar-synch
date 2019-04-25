@@ -24,7 +24,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>org.google.calendar.synch.CalendarSynchApp</mainClass>
+							<mainClass>org.google.calendar.synch.CalendarSynchAppV2</mainClass>
 						</manifest>
 					</archive>
 					<finalName>google-calendar-synch-service</finalName>

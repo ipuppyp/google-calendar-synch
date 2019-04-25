@@ -39,7 +39,7 @@ public class CalendarSynchApp {
 	private String getProperty(String key) {
 		String property = System.getProperty(key);
 		if (property == null) {
-			System.err.printf("Missing configuration: %s, please set it with -D\n", key);
+			LOGGER.error("Missing configuration: %s, please set it with -D\n", key);
 			System.exit(-1);
 		}
 		return property;
