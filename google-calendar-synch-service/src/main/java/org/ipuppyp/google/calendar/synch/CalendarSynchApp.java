@@ -1,6 +1,6 @@
-package org.google.calendar.synch;
+package org.ipuppyp.google.calendar.synch;
 
-import org.google.calendar.synch.service.CalendarCrudService;
+import org.ipuppyp.google.calendar.synch.service.CalendarCrudService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

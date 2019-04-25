@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<appender name="TIME_BASED_FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${user.home}/logs/calendar-synch.log</file>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- daily rollover -->
+			<fileNamePattern>${user.home}/logs/calendar-synch.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<maxHistory>3</maxHistory>
+		</rollingPolicy>
+
+		<encoder>
+			<pattern>%relative %-5level - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="org.ipuppyp.google.calendar.synch"
+		level="INFO" additivity="false">
+		<appender-ref ref="TIME_BASED_FILE" />
+	</logger>
+
+
+	<root level="info">
+		<appender-ref ref="TIME_BASED_FILE" />
+	</root>
+
+</configuration>

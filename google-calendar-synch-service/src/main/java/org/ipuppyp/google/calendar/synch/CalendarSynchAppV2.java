@@ -1,4 +1,4 @@
-package org.google.calendar.synch;
+package org.ipuppyp.google.calendar.synch;
 
 import static java.util.stream.Collectors.toList;
 
@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.google.calendar.synch.service.CalendarCrudService;
+import org.ipuppyp.google.calendar.synch.service.CalendarCrudService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,6 @@ public class CalendarSynchAppV2 {
 	}
 
 	public CalendarSynchAppV2() {
-		calendarCrudService = new CalendarCrudService(APPLICATION_NAME, CREDENTIALS, DATA_STORE_DIR);
 		sourceCalendar = getProperty("sourceCalendar");
 		targetCalendar = getProperty("targetCalendar");
 		eventPrefix = getProperty("eventPrefix");
@@ -71,7 +70,8 @@ public class CalendarSynchAppV2 {
 		LOGGER.info("* eventFilter = {}\t*", eventFilter);
 		LOGGER.info("*********************************");
 
-		try {			
+		try {
+			calendarCrudService = new CalendarCrudService(APPLICATION_NAME, CREDENTIALS, DATA_STORE_DIR);		
 			synch();
 		}
 		catch (Exception ex) {
