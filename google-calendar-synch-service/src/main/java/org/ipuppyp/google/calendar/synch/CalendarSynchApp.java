@@ -62,7 +62,7 @@ public class CalendarSynchApp {
 		Calendar source = calendarCrudService.findCalendarByName(sourceCalendar);
 		Calendar target = calendarCrudService.findCalendarByName(targetCalendar);
 		removeAllEvents(target, eventPrefix);
-		//copyAllEvent(source, target, eventPrefix, eventFilter);
+		copyAllEvent(source, target, eventPrefix, eventFilter);
 
 		LOGGER.info("******************************");
 		LOGGER.info("* SYNCHRONIZATION FINISHED.  *");

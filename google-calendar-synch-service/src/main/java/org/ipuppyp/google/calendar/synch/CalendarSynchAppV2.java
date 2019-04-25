@@ -50,7 +50,7 @@ public class CalendarSynchAppV2 {
 	private String getProperty(String key) {
 		String property = System.getProperty(key);
 		if (property == null) {
-			LOGGER.error("Missing configuration: %s, please set it with -D\n", key);
+			LOGGER.error("Missing configuration: \"{}\", please set it with -D\n", key);
 			System.exit(-1);
 		}
 		return property;
@@ -135,8 +135,8 @@ public class CalendarSynchAppV2 {
 	}
 	private boolean equals(Event event, Event origEvent) {
 		return Objects.equals(origEvent.getSummary(), event.getSummary()) &&
-				Objects.equals(origEvent.getDescription(), event.getDescription()) &&
 				Objects.equals(origEvent.getStart(), event.getStart()) &&
+				Objects.equals(origEvent.getDescription(), event.getDescription()) &&
 				Objects.equals(origEvent.getEnd(), event.getEnd());
 	}
 	
@@ -156,6 +156,7 @@ public class CalendarSynchAppV2 {
 		shared.put(ORIG_I_CAL_UID, event.getICalUID());
 		return event
 				.setSummary(eventPrefix + " " + event.getSummary())
+				.setDescription("see details in original event")
 				.setId(null)
 				.setExtendedProperties(new ExtendedProperties().setShared(shared))
 				.setICalUID(null);
