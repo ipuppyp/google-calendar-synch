@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.ipuppyp.google.calendar.synch.service.CalendarCrudService;
 import org.slf4j.Logger;
@@ -18,6 +19,8 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Event.ExtendedProperties;
 
 public class CalendarSynchAppV2 {
+
+	private static final String PRIVATE = "private";
 
 	private static final String ORIG_I_CAL_UID = "origICalUID";
 
@@ -33,8 +36,9 @@ public class CalendarSynchAppV2 {
 	private final String eventPrefix;
 	private final String sourceCalendar;
 	private final String eventFilter;
-
-	CalendarCrudService calendarCrudService;
+	private final Pattern eventFilterPattern;
+	
+	private CalendarCrudService calendarCrudService;
 
 	public static void main(String[] args) {
 		new CalendarSynchAppV2().doSynch();
@@ -45,6 +49,8 @@ public class CalendarSynchAppV2 {
 		targetCalendar = getProperty("targetCalendar");
 		eventPrefix = getProperty("eventPrefix");
 		eventFilter = getProperty("eventFilter");
+		eventFilterPattern = Pattern.compile(eventFilter);
+		
 	}
 
 	private String getProperty(String key) {
@@ -90,7 +96,8 @@ public class CalendarSynchAppV2 {
 		Calendar target = calendarCrudService.findCalendarByName(targetCalendar);
 		
 		List<Event> eventsInSource = calendarCrudService.findEventsByCalendar(source).getItems().stream()
-				.filter(event -> !contains(event.getSummary(), (eventFilter))).map(this::setIds).collect(toList());
+				.filter(event -> !PRIVATE.equals(event.getVisibility()))
+				.filter(event -> !contains(event.getSummary())).map(this::setIds).collect(toList());
 		List<Event> eventsInTarget = calendarCrudService.findEventsByCalendar(target).getItems().stream()
 				.filter(event -> event.getSummary().contains(eventPrefix)).collect(toList());
 
@@ -141,14 +148,8 @@ public class CalendarSynchAppV2 {
 	}
 	
 	
-	private boolean contains(String str, String patterns) {
-		String[] split = patterns.split(";");
-		for (String pattern : split) {
-			if (str.toLowerCase().contains(pattern.toLowerCase())) {
-				return true;
-			}
-		}
-		return false;
+	private boolean contains(String str) {
+		return eventFilterPattern.matcher(str).find();
 	}
 	
 	private Event setIds(Event event) {
