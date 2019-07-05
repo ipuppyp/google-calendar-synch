@@ -1,5 +1,6 @@
 package org.ipuppyp.google.calendar.synch;
 
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
@@ -49,7 +50,7 @@ public class CalendarSynchAppV2 {
 		targetCalendar = getProperty("targetCalendar");
 		eventPrefix = getProperty("eventPrefix");
 		eventFilter = getProperty("eventFilter");
-		eventFilterPattern = Pattern.compile(eventFilter);
+		eventFilterPattern = Pattern.compile(eventFilter, CASE_INSENSITIVE);
 		
 	}
 
