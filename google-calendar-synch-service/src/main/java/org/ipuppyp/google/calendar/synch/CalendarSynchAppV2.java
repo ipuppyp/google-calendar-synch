@@ -98,7 +98,9 @@ public class CalendarSynchAppV2 {
 		
 		List<Event> eventsInSource = calendarCrudService.findEventsByCalendar(source).getItems().stream()
 				.filter(event -> !PRIVATE.equals(event.getVisibility()))
-				.filter(event -> !contains(event.getSummary())).map(this::setIds).collect(toList());
+				.filter(event -> !eventFilterPattern.matcher(event.getSummary()).find())
+				.map(this::setIds)	
+				.collect(toList());
 		List<Event> eventsInTarget = calendarCrudService.findEventsByCalendar(target).getItems().stream()
 				.filter(event -> event.getSummary().contains(eventPrefix)).collect(toList());
 
@@ -146,11 +148,6 @@ public class CalendarSynchAppV2 {
 				Objects.equals(origEvent.getStart(), event.getStart()) &&
 				Objects.equals(origEvent.getDescription(), event.getDescription()) &&
 				Objects.equals(origEvent.getEnd(), event.getEnd());
-	}
-	
-	
-	private boolean contains(String str) {
-		return eventFilterPattern.matcher(str).find();
 	}
 	
 	private Event setIds(Event event) {
