@@ -125,7 +125,10 @@ public class CalendarCrudService {
 		try {
 
 			LOGGER.debug("Loading events for calendar {}...", calendar.getSummary());
-			Events events = client.events().list(calendar.getId()).setMaxResults(100).setSingleEvents(true)
+			Events events = client.events().list(calendar.getId())
+					.setMaxResults(100)
+					.setShowHiddenInvitations(true)
+					//.setSingleEvents(true)
 					.setTimeMin(new DateTime(new Date())).execute();
 			LOGGER.debug("{} Events found.", events.getItems().size());
 			return events;

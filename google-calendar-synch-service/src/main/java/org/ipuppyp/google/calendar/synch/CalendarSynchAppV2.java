@@ -1,5 +1,6 @@
 package org.ipuppyp.google.calendar.synch;
 
+import static java.lang.Boolean.valueOf;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.stream.Collectors.toList;
 
@@ -38,6 +39,7 @@ public class CalendarSynchAppV2 {
 	private final String sourceCalendar;
 	private final String eventFilter;
 	private final Pattern eventFilterPattern;
+	private final boolean publicOnly;
 	
 	private CalendarCrudService calendarCrudService;
 
@@ -51,6 +53,7 @@ public class CalendarSynchAppV2 {
 		eventPrefix = getProperty("eventPrefix");
 		eventFilter = getProperty("eventFilter");
 		eventFilterPattern = Pattern.compile(eventFilter, CASE_INSENSITIVE);
+		publicOnly = valueOf(getProperty("publicOnly"));
 		
 	}
 
@@ -75,6 +78,7 @@ public class CalendarSynchAppV2 {
 		LOGGER.info("* targetCalendar = {}\t*", targetCalendar);
 		LOGGER.info("* eventPrefix = {}\t*", eventPrefix);
 		LOGGER.info("* eventFilter = {}\t*", eventFilter);
+		LOGGER.info("* publicOnly = {}\t*", publicOnly);
 		LOGGER.info("*********************************");
 
 		try {
@@ -97,13 +101,14 @@ public class CalendarSynchAppV2 {
 		Calendar target = calendarCrudService.findCalendarByName(targetCalendar);
 		
 		List<Event> eventsInSource = calendarCrudService.findEventsByCalendar(source).getItems().stream()
-				.filter(event -> !PRIVATE.equals(event.getVisibility()))
+				.filter(event -> !(publicOnly && PRIVATE.equals(event.getVisibility())))
 				.filter(event -> !eventFilterPattern.matcher(event.getSummary()).find())
+				.map(event -> event.setVisibility(null))
 				.map(this::setIds)	
 				.collect(toList());
 		List<Event> eventsInTarget = calendarCrudService.findEventsByCalendar(target).getItems().stream()
-				.filter(event -> event.getSummary().contains(eventPrefix)).collect(toList());
-
+				.filter(event -> event.getSummary().contains(eventPrefix))
+				.collect(toList());
 		
 		List<Event> newEvents = eventsInSource.stream().filter(event -> !contains(eventsInTarget, event)).collect(toList());
 		List<Event> deletedEvents = eventsInTarget.stream().filter(event -> !contains(eventsInSource, event)).collect(toList());
