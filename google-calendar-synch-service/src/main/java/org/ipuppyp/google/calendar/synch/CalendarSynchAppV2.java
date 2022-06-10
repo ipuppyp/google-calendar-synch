@@ -107,7 +107,9 @@ public class CalendarSynchAppV2 {
 				.map(this::setIds)	
 				.collect(toList());
 		List<Event> eventsInTarget = calendarCrudService.findEventsByCalendar(target).getItems().stream()
-				.filter(event -> event.getSummary().contains(eventPrefix))
+				.filter(event -> {
+					return !"cancelled".equals(event.getStatus()) && event.getSummary().contains(eventPrefix);
+				})
 				.collect(toList());
 		
 		List<Event> newEvents = eventsInSource.stream().filter(event -> !contains(eventsInTarget, event)).collect(toList());
